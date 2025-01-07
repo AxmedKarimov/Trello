@@ -1,0 +1,85 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+/* Global styles */
+body {
+  background-color: #f8f9fa;
+  font-family: "Arial", sans-serif;
+}
+
+/* Container styles */
+.p-3 {
+  padding: 1rem !important;
+}
+
+/* Card styles */
+.card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+.card h1 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Input styles */
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Button styles */
+.btn {
+  background-color: #007bff;
+  color: white;
+  border-radius: 0.5rem;
+  border: none;
+  padding: 0.5rem;
+  transition: background-color 0.3s;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+/* List styles */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+ul .card {
+  margin: 0.5rem 0;
+}
+
+/* Flexbox styles for main layout */
+.d-flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .w-25 {
+    width: 100%;
+  }
+}
