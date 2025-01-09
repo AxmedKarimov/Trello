@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { store } from "./fireBaseConfig";
 import {
   collection,
-  getDocs,
   addDoc,
   updateDoc,
   doc,
   deleteDoc,
+  onSnapshot,
 } from "firebase/firestore";
 
 interface Todo {
@@ -22,15 +22,17 @@ function App() {
   const [newTitle, setNewTitle] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
-      const querySnapshot = await getDocs(collection(store, "Tasks"));
-      const todosData: Todo[] = [];
-      querySnapshot.forEach((doc) => {
-        todosData.push({ id: doc.id, ...doc.data() } as Todo);
-      });
-      setTodos(todosData);
-    };
-    fetchData();
+    const unsubscribe = onSnapshot(
+      collection(store, "Tasks"),
+      (querySnapshot) => {
+        const todosData: Todo[] = [];
+        querySnapshot.forEach((doc) => {
+          todosData.push({ id: doc.id, ...doc.data() } as Todo);
+        });
+        setTodos(todosData);
+      }
+    );
+    return () => unsubscribe();
   }, []);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,12 +41,10 @@ function App() {
 
   const handleAddTask = async () => {
     if (inputValue.trim() === "") return;
-
     const newTask = {
       title: inputValue,
       status: "To Do",
     };
-
     try {
       const docRef = await addDoc(collection(store, "Tasks"), newTask);
       setTodos((prevTodos) => [...prevTodos, { id: docRef.id, ...newTask }]);
@@ -65,11 +65,9 @@ function App() {
 
   const handleEditSubmit = async (todo: Todo) => {
     if (newTitle.trim() === "") return;
-
     try {
       const todoRef = doc(store, "Tasks", todo.id);
       await updateDoc(todoRef, { title: newTitle });
-
       setTodos((prevTodos) =>
         prevTodos.map((t) => (t.id === todo.id ? { ...t, title: newTitle } : t))
       );
@@ -84,7 +82,6 @@ function App() {
     try {
       const todoRef = doc(store, "Tasks", todoId);
       await deleteDoc(todoRef);
-
       setTodos((prevTodos) => prevTodos.filter((todo) => todo.id !== todoId));
     } catch (error) {
       console.error("Error deleting task:", error);
@@ -103,15 +100,12 @@ function App() {
     newStatus: string
   ) => {
     event.preventDefault();
-
     const todoId = event.dataTransfer.getData("todoId");
     const todoToUpdate = todos.find((todo) => todo.id === todoId);
-
     if (todoToUpdate) {
       try {
         const todoRef = doc(store, "Tasks", todoToUpdate.id);
         await updateDoc(todoRef, { status: newStatus });
-
         setTodos((prevTodos) =>
           prevTodos.map((todo) =>
             todo.id === todoId ? { ...todo, status: newStatus } : todo
@@ -143,7 +137,6 @@ function App() {
         </button>
       </div>
       <div className="d-flex justify-content-center gap-3 mb-3">
-        {/* To Do Column */}
         <div
           className="card p-3 w-25"
           onDrop={(event) => handleDrop(event, "To Do")}
@@ -195,8 +188,6 @@ function App() {
               ))}
           </ul>
         </div>
-
-        {/* In Progress Column */}
         <div
           className="card p-3 w-25"
           onDrop={(event) => handleDrop(event, "In Progress")}
@@ -248,8 +239,6 @@ function App() {
               ))}
           </ul>
         </div>
-
-        {/* Done Column */}
         <div
           className="card p-3 w-25"
           onDrop={(event) => handleDrop(event, "Done")}
